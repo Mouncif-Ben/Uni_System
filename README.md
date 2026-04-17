@@ -1,5 +1,3 @@
-# Uni_System
-Système Intelligent d'Optimisation et d'Aide à la Décision pour la Gestion Universitaire
 # UniSmart — Système Intelligent de Gestion Universitaire
 
 > Système web d'aide à la décision pour la gestion universitaire, combinant Machine Learning et algorithmes d'optimisation.
