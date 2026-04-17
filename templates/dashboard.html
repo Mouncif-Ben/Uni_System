@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniSmart</title>
+  <link rel="stylesheet" href="../static/css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+</head>
+
+<body>
+  <!--Navbar-->
+  <div class="navbar navbar-expand-lg sticky-top" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand">UniSmart</a>
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu" aria-expanded="false"
+        aria-controls="menu" aria-label="Toggle Menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menu">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a href="#" class="nav-link active" role="button">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a href="students.html" class="nav-link" role="button">Etudiants</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" role="button">Emploi du temps</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" role="button">Stats</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!--Sidebar-->
+  <!-- <div class="sidebar pt-2 pb-5 position-absolute">
+    <ul class="">
+      <li class="py-2">
+        <a href="#" class="text-decoration-none text-white">Dashboard</a>
+      </li>
+      <li class="py-2">
+        <a href="#" class="text-decoration-none text-white">Etudiants</a>
+      </li>
+      <li class="py-2">
+        <a href="#" class="text-decoration-none text-white">Emploi du temps</a>
+      </li>
+      <li class="py-2">
+        <a href="#" class="text-decoration-none text-white">Predictions</a>
+      </li>
+      <li class="py-2">
+        <a href="#" class="text-decoration-none text-white">Salles</a>
+      </li>
+      <li class="py-2">
+        <a href="#" class="text-decoration-none text-white">Professeurs</a>
+      </li>
+    </ul>
+  </div> -->
+
+  <!--Main page-->
+  <div class="main my-4">
+    <div class="container-md">
+      <h2 class="mb-5">Dashboard</h2>
+      <div class="d-flex cards ">
+        <div class="me-3 flex-grow-1" >
+          <h4 class="fw-bold fs-2  ps-3" style="color: rgb(0, 191, 255);">00</h4>
+          <p class="ps-3">Total etudiants</p>
+        </div>
+        <div class="mx-3 flex-grow-1">
+          <h4 class="fw-bold fs-2 ps-3" style="color: rgb(122, 27, 27);">00</h4>
+          <p class="ps-3">A risque</p>
+        </div>
+        <div class="mx-3 flex-grow-1">
+          <h4 class="fw-bold fs-2 ps-3" style="color: rgb(39, 122, 13);">00</h4>
+          <p class="ps-3">Cours actifs</p>
+        </div>
+        <div class="mx-3 flex-grow-1">
+          <h4 class="fw-bold fs-2 ps-3" style="color: rgb(214, 176, 23);">00</h4>
+          <p class="ps-3">Salles</p>
+        </div>
+      </div>
+      <div class="row mt-5">
+
+        <div class="col-md-12 col-lg-7 mb-5" >
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title border-bottom pb-3">Etudiants a risque par filiere</h5>
+              <div class="box d-flex align-items-center gap-3 my-4">
+                <p class="mb-0 w-20" style="width: 100px;">Informatique</p>
+                <div class="progress flex-grow-1" style="height: 15px;">
+                  <div class="progress-bar bg-primary" style="width: 50%"></div>
+                </div>
+                <p class="mb-0" >00</p>
+              </div>
+
+              <div class="box d-flex align-items-center gap-3 my-4">
+                <p class="mb-0" style="width: 100px;">Physique</p>
+                <div class="progress flex-grow-1" style="height: 15px;">
+                  <div class="progress-bar bg-success" style="width: 50%"></div>
+                </div>
+                <p class="mb-0">00</p>
+              </div>
+
+              <div class="box d-flex align-items-center gap-3 my-4">
+                <p class="mb-0" style="width: 100px;">Mathematiq</p>
+                <div class="progress flex-grow-1" style="height: 15px;">
+                  <div class="progress-bar bg-warning" style="width: 50%"></div>
+                </div>
+                <p class="mb-0">00</p>
+              </div>
+
+              <div class="box d-flex align-items-center gap-3 my-4">
+                <p class="mb-0" style="width: 100px;">Chimie</p>
+                <div class="progress flex-grow-1" style="height: 15px;">
+                  <div class="progress-bar bg-danger" style="width: 50%"></div>
+                </div>
+                <p class="mb-0">00</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12 col-lg-5">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Dernieres predictions</h5>
+            </div>
+
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item fw-bold bg-light text-body-tertiary">
+                <ul class="list-unstyled d-flex justify-content-between px-3">
+                  <li>Nome</li>
+                  <li>Score</li>
+                  <li>Status</li>
+                </ul>
+              </li>
+              <li class="list-group-item">
+                <ul class="list-unstyled d-flex justify-content-between px-3">
+                  <li>Nome</li>
+                  <li>Score</li>
+                  <li>Status</li>
+                </ul>
+              </li>
+              <li class="list-group-item">
+                <ul class="list-unstyled d-flex justify-content-between px-3">
+                  <li>Nome</li>
+                  <li>Score</li>
+                  <li>Status</li>
+                </ul>
+              <li class="list-group-item">
+                <ul class="list-unstyled d-flex justify-content-between px-3">
+                  <li>Nome</li>
+                  <li>Score</li>
+                  <li>Status</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

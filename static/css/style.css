@@ -1,0 +1,84 @@
+:root {
+  --dark-color: #19283f;
+  --green-color: #33d1cc;
+  --red-color: #ff3150;
+  --yellow-color: #ffc400;
+  --section-color: #eff7fa;
+}
+
+
+/*First Dashboard*/
+body {
+  background-color: var(--section-color) !important;
+}
+
+.navbar {
+  /* background-color: #212529; */
+  background-color: #0F172A;
+}
+
+.navbar .navbar-brand {
+  color: #93C5FD;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.sidebar {
+  background-color: var(--dark-color);
+  width: 200px;
+  height: 700px;
+  color: white;
+}
+
+.cards div {
+  background-color: white;
+  padding: 10px;
+  width: 200px;
+  border-radius: 5px;
+  border: 1px solid rgb(223, 223, 223);
+
+}
+
+li::marker {
+  font-size: 25px;
+}
+
+.safe {
+  color: green;
+}
+
+.risque {
+  color: brown;
+}
+
+.safe,
+.risque {
+  position: relative;
+}
+
+.safe::before,
+.risque::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 82px;
+  bottom: 11px;
+  left: -12px;
+  z-index: -1;
+  border-radius: 30px;
+}
+
+.safe::before {
+  background-color: rgb(157, 222, 157);
+}
+
+.risque::before {
+  background-color: #ffc7c7;
+}
+
+/*End Dashboard*/
+
+
+body {
+  font-family: "Cairo", sans-serif;
+}

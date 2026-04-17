@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniSmart</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="../static/css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+</head>
+
+<body>
+  <!--Navbar-->
+  <div class="navbar navbar-expand-lg sticky-top" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand">UniSmart</a>
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu" aria-expanded="false"
+        aria-controls="menu" aria-label="Toggle Menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menu">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a href="dashboard.html" class="nav-link" role="button">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link active" role="button">Etudiants</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" role="button">Emploi du temps</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" role="button">Stats</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="student-content mt-5">
+    <div class="container">
+      <div class="d-flex justify-content-between">
+        <h4>Liste des etudinats</h4>
+        <button class="btn text-white" style="background-color: rgb(45, 67, 142);">+ Ajouter</button>
+      </div>
+      <form class="mt-4 mb-4">
+        <select name="list de etudiants" class="form-control py-3">
+          <option value="">Toutes filieres</option>
+        </select>
+      </form>
+      
+      <table style=" width:100%">
+        <tr class="fw-bold bg-light text-body-tertiary border ">
+          <th class="p-3">Nom</th>
+          <th>Filiere</th>
+          <th>Note</th>
+          <th>Assiduite</th>
+          <th>Participation</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+        <tr class="border">
+          <td class="p-3">Ahmed rali</td>
+          <td>Informatique</td>
+          <td>42</td>
+          <td>55%</td>
+          <td>30%</td>
+          <td class="rounded-pill fw-bold safe" >safe</td>
+          <td>Voir</td>
+        </tr>
+        <tr class="border">
+          <td class="p-3">adam bli</td>
+          <td>Physique</td>
+          <td>82</td>
+          <td>55%</td>
+          <td>30%</td>
+          <td class="rounded-pill fw-bold risque">A risque</td>
+          <td>Voir</td>
+        </tr>
+        <tr class="border">
+          <td class="p-3">reda raho</td>
+          <td>Math</td>
+          <td>55</td>
+          <td>65%</td>
+          <td>30%</td>
+          <td class="rounded-pill fw-bold safe">safe</td>
+          <td>Voir</td>
+        </tr>
+        <tr class="border">
+          <td class="p-3">reda raho</td>
+          <td>Math</td>
+          <td>55</td>
+          <td>65%</td>
+          <td>30%</td>
+          <td class="rounded-pill fw-bold risque">A risque</td>
+          <td>Voir</td>
+        </tr>
+        <tr class="border">
+          <td class="p-3">reda raho</td>
+          <td>Math</td>
+          <td>55</td>
+          <td>65%</td>
+          <td>30%</td>
+          <td class="rounded-pill fw-bold safe">safe</td>
+          <td>Voir</td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
+
+
+  <!--Bootstrap for Js-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
