@@ -48,32 +48,13 @@ li::marker {
 }
 
 .risque {
-  color: brown;
-}
-
-.safe,
-.risque {
-  position: relative;
-}
-
-.safe::before,
-.risque::before {
-  content: '';
-  position: absolute;
-  top: 12px;
-  right: 82px;
-  bottom: 11px;
-  left: -12px;
-  z-index: -1;
-  border-radius: 30px;
-}
-
-.safe::before {
-  background-color: rgb(157, 222, 157);
-}
-
-.risque::before {
   background-color: #ffc7c7;
+  color: brown !important;
+}
+
+.safe{
+  background-color: rgb(157, 222, 157);
+  color: green !important;
 }
 
 /*End Dashboard*/
@@ -81,4 +62,8 @@ li::marker {
 
 body {
   font-family: "Cairo", sans-serif;
+}
+
+tbody td{
+  background-color: var(--section-color) !important;
 }

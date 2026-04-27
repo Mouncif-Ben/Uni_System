@@ -24,16 +24,16 @@
       <div class="collapse navbar-collapse" id="menu">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a href="dashboard.html" class="nav-link" role="button">Dashboard</a>
+            <a href="{{url_for('dashboard_page')}}" class="nav-link" role="button">Dashboard</a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link active" role="button">Etudiants</a>
+            <a href="{{url_for('students_page')}}" class="nav-link active" role="button">Etudiants</a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link" role="button">Emploi du temps</a>
+            <a href="{{url_for('timetable_page')}}" class="nav-link" role="button">Emploi du temps</a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link" role="button">Stats</a>
+            <a href="#" class="nav-link" role="button">Predictions</a>
           </li>
         </ul>
       </div>
@@ -44,74 +44,52 @@
     <div class="container">
       <div class="d-flex justify-content-between">
         <h4>Liste des etudinats</h4>
-        <button class="btn text-white" style="background-color: rgb(45, 67, 142);">+ Ajouter</button>
+        <!-- <button class="btn text-white" style="background-color: rgb(45, 67, 142);">+ Ajouter</button> -->
+        <p>Total : {{ total }} etudiants — {{ at_risk }} a risque</p>
       </div>
       <form class="mt-4 mb-4">
         <select name="list de etudiants" class="form-control py-3">
           <option value="">Toutes filieres</option>
         </select>
       </form>
-      
-      <table style=" width:100%">
-        <tr class="fw-bold bg-light text-body-tertiary border ">
-          <th class="p-3">Nom</th>
-          <th>Filiere</th>
-          <th>Note</th>
-          <th>Assiduite</th>
-          <th>Participation</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-        <tr class="border">
-          <td class="p-3">Ahmed rali</td>
-          <td>Informatique</td>
-          <td>42</td>
-          <td>55%</td>
-          <td>30%</td>
-          <td class="rounded-pill fw-bold safe" >safe</td>
-          <td>Voir</td>
-        </tr>
-        <tr class="border">
-          <td class="p-3">adam bli</td>
-          <td>Physique</td>
-          <td>82</td>
-          <td>55%</td>
-          <td>30%</td>
-          <td class="rounded-pill fw-bold risque">A risque</td>
-          <td>Voir</td>
-        </tr>
-        <tr class="border">
-          <td class="p-3">reda raho</td>
-          <td>Math</td>
-          <td>55</td>
-          <td>65%</td>
-          <td>30%</td>
-          <td class="rounded-pill fw-bold safe">safe</td>
-          <td>Voir</td>
-        </tr>
-        <tr class="border">
-          <td class="p-3">reda raho</td>
-          <td>Math</td>
-          <td>55</td>
-          <td>65%</td>
-          <td>30%</td>
-          <td class="rounded-pill fw-bold risque">A risque</td>
-          <td>Voir</td>
-        </tr>
-        <tr class="border">
-          <td class="p-3">reda raho</td>
-          <td>Math</td>
-          <td>55</td>
-          <td>65%</td>
-          <td>30%</td>
-          <td class="rounded-pill fw-bold safe">safe</td>
-          <td>Voir</td>
-        </tr>
+
+      <table class="table table-hover w-100 border">
+        <thead>
+          <tr class="fw-bold bg-light ">
+            <th scope="col" class="p-3 text-body-tertiary">Nom</th>
+            <th scope="col" class="p-3 text-body-tertiary">Filiere</th>
+            <th scope="col" class="p-3 text-body-tertiary">Note</th>
+            <th scope="col" class="p-3 text-body-tertiary">Assiduite</th>
+            <th scope="col" class="p-3 text-body-tertiary">Participation</th>
+            <th scope="col" class="p-3 text-body-tertiary">Status</th>
+            <th scope="col" class="p-3 text-body-tertiary">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+            <tr class="border">
+              <td class="p-3">{{student['nom']}}</td>
+              <td class="p-3">{{student['filiere']}}</td>
+              <td class="p-3 font-monospace">{{student['note']}}</td>
+              <td class="p-3 font-monospace">{{student['assiduite'] | int}}%</td>
+              <td class="p-3 font-monospace">{{student['participation'] | int}}%</td>
+              <td class="p-3">
+                {% if student['at_risk'] == 1 %}
+                  <span class="badge fw-bold fs-6 rounded-pill risque">A risque</span>
+                {% else %}
+                  <span class="badge fw-bold fs-6 rounded-pill safe">safe</span>
+                {% endif %}
+              </td>
+              <td>
+                <button class="btn btn-outline-success">Voir</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
       </table>
 
     </div>
   </div>
-
 
   <!--Bootstrap for Js-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

@@ -25,10 +25,10 @@
             <a href="#" class="nav-link active" role="button">Dashboard</a>
           </li>
           <li class="nav-item">
-            <a href="students.html" class="nav-link" role="button">Etudiants</a>
+            <a href="{{url_for('students_page')}}" class="nav-link" role="button">Etudiants</a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link" role="button">Emploi du temps</a>
+            <a href="{{url_for('timetable_page')}}" class="nav-link" role="button">Emploi du temps</a>
           </li>
           <li class="nav-item">
             <a href="#" class="nav-link" role="button">Stats</a>
@@ -68,11 +68,11 @@
       <h2 class="mb-5">Dashboard</h2>
       <div class="d-flex cards ">
         <div class="me-3 flex-grow-1" >
-          <h4 class="fw-bold fs-2  ps-3" style="color: rgb(0, 191, 255);">00</h4>
+          <h4 class="fw-bold fs-2  ps-3" style="color: rgb(0, 191, 255);">{{ status['total'] }}</h4>
           <p class="ps-3">Total etudiants</p>
         </div>
         <div class="mx-3 flex-grow-1">
-          <h4 class="fw-bold fs-2 ps-3" style="color: rgb(122, 27, 27);">00</h4>
+          <h4 class="fw-bold fs-2 ps-3" style="color: rgb(122, 27, 27);">{{ status['at_risk'] }}</h4>
           <p class="ps-3">A risque</p>
         </div>
         <div class="mx-3 flex-grow-1">
@@ -90,75 +90,54 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title border-bottom pb-3">Etudiants a risque par filiere</h5>
-              <div class="box d-flex align-items-center gap-3 my-4">
-                <p class="mb-0 w-20" style="width: 100px;">Informatique</p>
-                <div class="progress flex-grow-1" style="height: 15px;">
-                  <div class="progress-bar bg-primary" style="width: 50%"></div>
+              
+              {% set colors = ['red', 'blue', 'green', 'orange', 'purple', 'cyan'] %}
+              {% for filiere in at_risk_par_filiere %}
+                <div class="box d-flex align-items-center gap-3 my-4">
+                  <p class="mb-0 w-20" style="width: 120px;">{{filiere}}</p>
+                  <div class="progress flex-grow-1" style="height: 15px;">
+                    <div class="progress-bar" style="width: {{at_risk_percentage[filiere]}}%; background-color: {{ colors[loop.index0 % (colors|length)] }};"></div>
+                  </div>
+                  <p class="mb-0" >{{at_risk_par_filiere[filiere]}}</p>
                 </div>
-                <p class="mb-0" >00</p>
-              </div>
+              {% endfor %}
 
-              <div class="box d-flex align-items-center gap-3 my-4">
-                <p class="mb-0" style="width: 100px;">Physique</p>
-                <div class="progress flex-grow-1" style="height: 15px;">
-                  <div class="progress-bar bg-success" style="width: 50%"></div>
-                </div>
-                <p class="mb-0">00</p>
-              </div>
 
-              <div class="box d-flex align-items-center gap-3 my-4">
-                <p class="mb-0" style="width: 100px;">Mathematiq</p>
-                <div class="progress flex-grow-1" style="height: 15px;">
-                  <div class="progress-bar bg-warning" style="width: 50%"></div>
-                </div>
-                <p class="mb-0">00</p>
-              </div>
-
-              <div class="box d-flex align-items-center gap-3 my-4">
-                <p class="mb-0" style="width: 100px;">Chimie</p>
-                <div class="progress flex-grow-1" style="height: 15px;">
-                  <div class="progress-bar bg-danger" style="width: 50%"></div>
-                </div>
-                <p class="mb-0">00</p>
-              </div>
             </div>
           </div>
         </div>
 
-        <div class="col-md-12 col-lg-5">
-          <div class="card">
+        <div class="col-md-12 col-lg-5" >
+          <div class="card"> 
             <div class="card-body">
               <h5 class="card-title">Dernieres predictions</h5>
             </div>
 
-            <ul class="list-group list-group-flush">
+            <ul class="list-group list-group-flush" >
               <li class="list-group-item fw-bold bg-light text-body-tertiary">
-                <ul class="list-unstyled d-flex justify-content-between px-3">
-                  <li>Nome</li>
-                  <li>Score</li>
-                  <li>Status</li>
+                <ul class="list-unstyled d-flex w-100 px-3 ">
+                  <li style="width: 33%;">Nom</li>
+                  <li style="width: 30%; text-align: center;">Score</li>
+                  <li style="width: 30%; text-align: right;">Status</li>
                 </ul>
               </li>
-              <li class="list-group-item">
-                <ul class="list-unstyled d-flex justify-content-between px-3">
-                  <li>Nome</li>
-                  <li>Score</li>
-                  <li>Status</li>
-                </ul>
-              </li>
-              <li class="list-group-item">
-                <ul class="list-unstyled d-flex justify-content-between px-3">
-                  <li>Nome</li>
-                  <li>Score</li>
-                  <li>Status</li>
-                </ul>
-              <li class="list-group-item">
-                <ul class="list-unstyled d-flex justify-content-between px-3">
-                  <li>Nome</li>
-                  <li>Score</li>
-                  <li>Status</li>
-                </ul>
-              </li>
+            </ul>
+            <ul class="list-group list-group-flush" style="max-height: 310px; overflow-y: auto;" >
+              {% for student in students %}
+                <li class="list-group-item" >
+                  <ul class="list-unstyled d-flex w-100 px-3"> <!--Column 100% it has 3 columns so 100 / 3 = 33%-->
+                    <li style="width: 33%;">{{student['nom']}}</li>
+                    <li style="width: 33%; text-align: center;">{{student['score']}}%</li>
+                    <li style="width: 33%; text-align: right;">
+                      {% if student['level']=="A risque" %}
+                        <span  class="badge fw-bold fs-6 rounded-pill risque">{{student['level']}}</span>
+                      {% else %}
+                        <span class="badge fw-bold fs-6 rounded-pill safe">{{student['level']}}</span>
+                      {% endif %}
+                    </li>
+                  </ul>
+                </li>
+              {%endfor%}
             </ul>
           </div>
         </div>
