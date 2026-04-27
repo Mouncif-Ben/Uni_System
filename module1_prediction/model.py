@@ -184,6 +184,34 @@ def predict_all():
  
     return result
 
+
+def at_risk_by_filiere():
+    
+    predictions = predict_all()
+    info = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Informatique')
+    math = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Mathématiques')
+    ch = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Chimie')
+    ph = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Physique')
+    geo = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Géologie')
+    biol = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Biologie')
+    dic = {'Informatique':info,'Mathématiques':math,'Chimie':ch,'Physique':ph,'Géologie':geo,'Biologie':biol}
+    sorted_dic = dict(sorted(dic.items(), key=lambda x: x[1], reverse=True))
+    return sorted_dic 
+
+def at_risk_percentages():
+    data = at_risk_by_filiere()
+    total = sum(data.values())
+
+    percentages = {}
+    for k, v in data.items():
+        percentages[k] = round((v / total) * 100, 2) if total != 0 else 0
+
+    return percentages
+
+
+# ══════════════════════════════════════════════════════
+# STEP 4 — Get statistics for dashboard
+# ══════════════════════════════════════════════════════
 def get_stats():
     """
     Returns summary statistics for the dashboard.
@@ -226,34 +254,6 @@ def get_stats():
         'accuracy':     round(acc * 100, 1),
         'feature_imp':  feat_imp
     }
-
-def at_risk_by_filiere():
-    
-    predictions = predict_all()
-    info = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Informatique')
-    math = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Mathématiques')
-    ch = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Chimie')
-    ph = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Physique')
-    geo = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Géologie')
-    biol = sum(1 for s in predictions if s.get('prediction')==1 and s.get('filiere') == 'Biologie')
-    dic = {'Informatique':info,'Mathématiques':math,'Chimie':ch,'Physique':ph,'Géologie':geo,'Biologie':biol}
-    sorted_dic = dict(sorted(dic.items(), key=lambda x: x[1], reverse=True))
-    return sorted_dic 
-
-def at_risk_percentages():
-    data = at_risk_by_filiere()
-    total = sum(data.values())
-
-    percentages = {}
-    for k, v in data.items():
-        percentages[k] = round((v / total) * 100, 2) if total != 0 else 0
-
-    return percentages
-
-
-# ══════════════════════════════════════════════════════
-# STEP 4 — Get statistics for dashboard
-# ══════════════════════════════════════════════════════
 
 # ══════════════════════════════════════════════════════
 # RUN THIS FILE DIRECTLY TO TRAIN
