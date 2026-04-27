@@ -35,13 +35,14 @@ def get_db():
   return conn
 
 @app.route("/")
+@app.route("/dashboard")
 
 def dashboard_page():
   students = predict_all()  
   status = get_stats()
   at_risk_par_filiere = at_risk_by_filiere()
   at_risk_percentage = at_risk_percentages()
-  return render_template('dashboard.html',students=students,status=status,at_risk_par_filiere=at_risk_par_filiere,at_risk_percentage=at_risk_percentage)
+  return render_template('dashboard.html',active='dashboard',students=students,status=status,at_risk_par_filiere=at_risk_par_filiere,at_risk_percentage=at_risk_percentage)
   
 @app.route("/students")
 
@@ -53,6 +54,7 @@ def students_page():
   conn.close()
   return render_template(
     'students.html',
+    active = 'students',
     students=rows,
     total=total,
     at_risk=at_risk
@@ -61,7 +63,7 @@ def students_page():
 @app.route("/timetable")
 
 def timetable_page():
-  return render_template('timetable.html')
+  return render_template('timetable.html',active='timetable')
 
 def create_tables():
   conn = sqlite3.connect("university.db")
