@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Predictions{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+  <div class="d-flex justify-content-between">
+    <h3>Prediction du risque d'echec</h3>
+    <button class="btn btn-success fw-bold">Lancer la prediction</button>
+  </div>
+  <div class="d-flex mt-5 gap-3">
+    <div class="card px-3 py-2 flex-grow-1">
+      <h1 style="color: rgb(214, 40, 27);">{{status["at_risk"]}}</h1>
+      <p>Etudiants a risque</p>
+    </div>
+    <div class="card px-3 py-2 flex-grow-1">
+      <h1 style="color: rgb(39, 122, 13);">{{status["safe"]}}</h1>
+      <p>Etudiants safe</p>
+    </div>
+    <div class="card px-3 py-2 flex-grow-1">
+      <h1 style="color: rgb(19, 126, 175);">{{status["accuracy"]}}%</h1>
+      <p>Prediction du modele</p>
+    </div>
+  </div>
+  <div class="d-flex mt-5 gap-3 ">
+    <div class="card p-3 flex-grow-1">
+      <h5 class="border-bottom mb-3 py-3">Etudiants a risque — details</h5>
+      <table>
+        <tr class="fw-bold bg-light text-body-tertiary px-3">
+          <th class="ps-3 py-2">Nom</th>
+          <th class="py-2">Note</th>
+          <th class="py-2">Assiduite</th>
+          <th class="py-2">Score risque</th>
+        </tr>
+        {%for item in predictions_result%}
+        {% if item['at_risk'] == 1 %}
+        <tr>
+          <td class="ps-3" style="background-color: #FCEBEB !important;">{{item['nom']}}</td>
+          <td style="background-color: #FCEBEB !important;">{{item['note']}}</td>
+          <td style="background-color: #FCEBEB !important;">{{item['assiduite']}}%</td>
+          <td class="d-flex align-items-center" style="background-color: #FCEBEB !important;">
+            <span class="progress me-1" style="width: 100px;">
+              <span class="progress-bar" style="background-color: red; height: 100%;width: {{item['score']}}%;">
+              </span>
+            </span> {{item['score']}}%
+          </td>
+        </tr>
+        {%endif%}
+        {%endfor%}
+      </table>
+    </div>
+    <div class="card p-3" style="height: 300px;width: 500px;">
+      <h5 class="border-bottom py-3">Distribution globale</h5>
+      <div class="d-flex justify-content-center align-items-center gap-5 mt-3">
+        <div class="text-center">
+          <span class="d-flex mb-2 justify-content-center align-items-center fw-bold fs-2"
+            style="background-color: #FCEBEB; height: 100px; width: 100px; border-radius: 50%;color:#DC2626; border: solid #DC2626 4px;">{{status["at_risk"]}}</span>
+          A risque
+        </div>
+        <div class="text-center">
+          <span class="d-flex mb-2 justify-content-center align-items-center fw-bold fs-2"
+            style="background-color: #E1F5EE; height: 100px; width: 100px; border-radius: 50%;color: #0F6E56;border: solid #0F6E56 4px;">{{status["safe"]}}</span>
+          Safe
+        </div>
+      </div>
+      <p class="fs-6 text-center mt-4">Precision: <span class="fw-bold"
+          style="color: rgb(13, 99, 211);">{{status["accuracy"]}}%</span></p>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

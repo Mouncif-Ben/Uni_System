@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block title %}{{ student['nom'] }}{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+
+  <!-- Back button -->
+  <a href="{{ url_for('students_page') }}" class="btn btn-outline-secondary btn-sm mb-4">
+    ← Retour aux etudiants
+  </a>
+
+  <!-- ── HEADER ── -->
+  <div class="d-flex align-items-center
+              justify-content-between mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">{{ student['nom'] }}</h3>
+      <p class="text-muted mb-0">{{ student['filiere'] }}</p>
+    </div>
+
+    <!-- Status badge -->
+    {% if level == 'A risque' %}
+    <span class="badge fs-6 rounded-pill bg-danger">
+      A risque
+    </span>
+    {% elif level == 'Moyen' %}
+    <span class="badge fs-6 rounded-pill bg-warning text-dark">
+      Moyen
+    </span>
+    {% elif level == 'Safe' %}
+    <span class="badge fs-6 rounded-pill bg-success">
+      Safe
+    </span>
+    {% else %}
+    <span class="badge fs-6 rounded-pill bg-secondary">
+      Non analyse
+    </span>
+    {% endif %}
+  </div>
+
+  <div class="row g-4">
+
+    <!-- ── LEFT COLUMN — Student info ── -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title border-bottom pb-3 mb-4">
+            Informations academiques
+          </h5>
+
+          <!-- Note -->
+          <div class="d-flex justify-content-between
+                      align-items-center mb-4">
+            <div>
+              <p class="text-muted mb-1 small">Note</p>
+              <h4 class="fw-bold mb-0
+                {{ 'text-danger' if student['note'] < 50
+                   else 'text-success' }}">
+                {{ student['note'] }} / 20
+              </h4>
+            </div>
+            <!-- note progress bar -->
+            <div style="width:120px;">
+              <div class="progress" style="height:8px;">
+                <div class="progress-bar
+                  {{ 'bg-danger' if student['note'] < 50
+                     else 'bg-success' }}" style="width:{{ student['note'] }}%;">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assiduite -->
+          <div class="d-flex justify-content-between
+                      align-items-center mb-4">
+            <div>
+              <p class="text-muted mb-1 small">Assiduite</p>
+              <h4 class="fw-bold mb-0
+                {{ 'text-danger' if student['assiduite'] < 55
+                   else 'text-success' }}">
+                {{ student['assiduite'] | int }}%
+              </h4>
+            </div>
+            <div style="width:120px;">
+              <div class="progress" style="height:8px;">
+                <div class="progress-bar
+                  {{ 'bg-danger' if student['assiduite'] < 55
+                     else 'bg-success' }}" style="width:{{ student['assiduite'] }}%;">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Participation -->
+          <div class="d-flex justify-content-between
+                      align-items-center mb-4">
+            <div>
+              <p class="text-muted mb-1 small">Participation</p>
+              <h4 class="fw-bold mb-0
+                {{ 'text-danger' if student['participation'] < 40
+                   else 'text-success' }}">
+                {{ student['participation'] | int }}%
+              </h4>
+            </div>
+            <div style="width:120px;">
+              <div class="progress" style="height:8px;">
+                <div class="progress-bar
+                  {{ 'bg-danger' if student['participation'] < 40
+                     else 'bg-success' }}" style="width:{{ student['participation'] }}%;">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- at_risk from database -->
+          <div class="border-top pt-3 mt-2">
+            <p class="text-muted small mb-1">
+              Statut dans la base de donnees
+            </p>
+            {% if student['at_risk'] == 1 %}
+            <span class="badge bg-danger">
+              Marque a risque
+            </span>
+            {% else %}
+            <span class="badge bg-success">
+              Marque safe
+            </span>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT COLUMN — ML Prediction ── -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title border-bottom pb-3 mb-4">
+            Analyse ML — Random Forest
+          </h5>
+
+          {% if score is not none %}
+
+          <!-- Score circle -->
+          <div class="text-center mb-4">
+            {% if score >= 70 %}
+            {% set circle_color = '#DC2626' %}
+            {% elif score >= 40 %}
+            {% set circle_color = '#D97706' %}
+            {% else %}
+            {% set circle_color = '#16A34A' %}
+            {% endif %}
+
+            <div style="width:110px; height:110px;
+                        border-radius:50%;
+                        border:6px solid {{ circle_color }};
+                        display:flex;
+                        flex-direction:column;
+                        align-items:center;
+                        justify-content:center;
+                        margin:0 auto;">
+              <span style="font-size:28px;
+                           font-weight:700;
+                           color:{{ circle_color }};">
+                {{ score }}%
+              </span>
+              <span style="font-size:11px;
+                           color:#64748B;">
+                risque
+              </span>
+            </div>
+            <p class="mt-3 fw-bold" style="color:{{ circle_color }};">
+              {{ level }}
+            </p>
+          </div>
+
+          <!-- Score progress bar -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="small text-muted">Score de risque</span>
+              <span class="small fw-bold" style="color:{{ circle_color }};">
+                {{ score }}%
+              </span>
+            </div>
+            <div class="progress" style="height:10px;">
+              <div class="progress-bar" style="width:{{ score }}%;
+                          background:{{ circle_color }};">
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendation -->
+          <div class="p-3 rounded" style="background:
+                 {{ '#FEE2E2' if score >= 70
+                    else '#FEF3C7' if score >= 40
+                    else '#DCFCE7' }};">
+            <p class="fw-bold mb-1 small" style="color:{{ circle_color }};">
+              Recommandation
+            </p>
+            <p class="mb-0 small" style="color:{{ circle_color }};">
+              {% if score >= 70 %}
+              Cet etudiant necessite un suivi immediat
+              par le professeur. Risque d'echec eleve.
+              {% elif score >= 40 %}
+              Cet etudiant est en situation moyenne.
+              Un suivi regulier est conseille.
+              {% else %}
+              Cet etudiant est en bonne situation.
+              Continuer le suivi normal.
+              {% endif %}
+            </p>
+          </div>
+
+          {% else %}
+          <!-- Model not trained yet -->
+          <div class="text-center text-muted py-5">
+            <p>Modele non entraine.</p>
+            <p class="small">
+              Lancez la prediction depuis la page
+              <a href="/predictions">Predictions</a>
+            </p>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── BOTTOM — Why at risk explanation ── -->
+  {% if score is not none and score >= 40 %}
+  <div class="card mt-4 mb-4">
+    <div class="card-body">
+      <h5 class="card-title border-bottom pb-3">
+        Pourquoi cet etudiant est a risque ?
+      </h5>
+      <div class="row text-center">
+
+        <div class="col-4">
+          <p class="text-muted small mb-1">Note</p>
+          <h5 class="{{ 'text-danger' if student['note'] < 50
+                        else 'text-success' }}">
+            {{ student['note'] }}
+            {% if student['note'] < 50 %} ⚠️ Insuffisant {% else %} ✅ Acceptable {% endif %} </h5>
+        </div>
+
+        <div class="col-4">
+          <p class="text-muted small mb-1">Assiduite</p>
+          <h5 class="{{ 'text-danger' if student['assiduite'] < 55
+                        else 'text-success' }}">
+            {{ student['assiduite'] | int }}%
+            {% if student['assiduite'] < 55 %} ⚠️ Insuffisant {% else %} ✅ Acceptable {% endif %} </h5>
+        </div>
+
+        <div class="col-4">
+          <p class="text-muted small mb-1">Participation</p>
+          <h5 class="{{ 'text-danger' if student['participation'] < 40
+                        else 'text-success' }}">
+            {{ student['participation'] | int }}%
+            {% if student['participation'] < 40 %} ⚠️ Insuffisant {% else %} ✅ Acceptable {% endif %} </h5>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

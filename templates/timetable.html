@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Emploi du Temps</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="../static/css/style.css">
+  
+</head>
+
+<body>
+  <div id="splash">
+    <div class="splash-logo"><i class="fa-solid fa-calendar-check"></i></div>
+    <div class="splash-title">EDT Auto</div>
+    <div class="splash-sub">Système de gestion académique</div>
+    <div class="splash-bar-wrap">
+      <div class="splash-bar" id="splash-bar"></div>
+    </div>
+    <div class="splash-loading-text" id="splash-text">Chargement...</div>
+  </div>
+
+  <div class="swipe-trigger" id="swipe-trigger" onclick="openFullscreen()">
+    <div class="swipe-indicator">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="fullscreen-overlay" id="fullscreen-overlay">
+    <div class="fullscreen-handle" onclick="closeFullscreen()">
+      <div class="fullscreen-handle-bar"></div>
+    </div>
+    <div class="fullscreen-topbar">
+      <h3 id="fullscreen-title">Vue complète</h3>
+      <button class="btn btn-sm" onclick="closeFullscreen()"><i class="fa-solid fa-xmark"></i> Fermer</button>
+    </div>
+    <div class="fullscreen-body" id="fullscreen-body"></div>
+  </div>
+
+  <div class="app">
+
+
+    <div class="sidebar">
+      <div class="logo">
+        <h1><i class="fa-solid fa-calendar-check"></i> EDT Auto</h1>
+        <p>Gestion académique</p>
+      </div>
+      <div class="nav">
+        <div class="nav-item active" onclick="showPage('planning')" id="nav-planning">
+          <i class="fa-solid fa-calendar-days"></i> Emploi du Temps
+        </div>
+        <div class="nav-item" onclick="showPage('profs')" id="nav-profs">
+          <i class="fa-solid fa-users"></i> Professeurs
+        </div>
+        <div class="nav-item" onclick="showPage('salles')" id="nav-salles">
+          <i class="fa-solid fa-building"></i> Salles
+        </div>
+        <div class="nav-item" onclick="showPage('filieres')" id="nav-filieres">
+          <i class="fa-solid fa-graduation-cap"></i> Filières
+        </div>
+        <!--NEw-->
+        <button class="btn" onclick="goDashboard()" style="margin-left: 20px;
+          margin-top: 10px;
+          background: #e6e6ff;">
+          <i class="fa-solid fa-arrow-left"></i> Go back
+        </button>
+      </div>
+    </div>
+
+
+    <div class="main">
+
+
+      <div id="page-planning" class="page active">
+        <div class="topbar">
+          <h2>Emploi du Temps</h2>
+          <button class="btn btn-pdf" id="btn-download" style="display:none" onclick="downloadPDF()">
+            <i class="fa-solid fa-file-pdf"></i> Télécharger PDF
+          </button>
+        </div>
+        <div class="content">
+          <div class="steps-card">
+            <div class="steps-title"><i class="fa-solid fa-list-check"></i> Générer un emploi du temps</div>
+            <div class="steps-row">
+              <div class="step">
+                <div class="step-label"><span class="num" id="num1">1</span> Choisir le semestre</div>
+                <select id="semestre" onchange="loadFilieresBySemestre()">
+                  <option value="">-- Semestre --</option>
+                  <option value="S1">S1</option>
+                  <option value="S2">S2</option>
+                  <option value="S3">S3</option>
+                  <option value="S4">S4</option>
+                  <option value="S5">S5</option>
+                  <option value="S6">S6</option>
+                </select>
+              </div>
+              <div class="step-arrow">›</div>
+              <div class="step">
+                <div class="step-label"><span class="num" id="num2">2</span> Choisir la filière</div>
+                <select id="filiere" disabled onchange="onFiliereChange()">
+                  <option value="">-- Filière --</option>
+                </select>
+              </div>
+              <div class="step-arrow">›</div>
+              <div class="step">
+                <div class="step-label"><span class="num" id="num3">3</span> Générer</div>
+                <button class="btn btn-primary" onclick="generate()" id="btn-generer" disabled>
+                  <i class="fa-solid fa-rotate"></i> Générer
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="stats-bar" class="stats-grid" style="display:none">
+            <div class="stat-card">
+              <div class="stat-label">Créneaux placés</div>
+              <div class="stat-value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Professeurs</div>
+              <div class="stat-value" id="stat-profs">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Salles utilisées</div>
+              <div class="stat-value" id="stat-salles">0</div>
+            </div>
+          </div>
+          <div id="loading-state" class="card" style="display:none">
+            <div class="loading-bar">
+              <div class="dot"></div> Algorithme de backtracking en cours...
+            </div>
+          </div>
+          <div id="empty-state" class="card">
+            <div class="empty-state">
+              <i class="fa-solid fa-calendar-xmark"></i>
+              <p style="font-weight:600;color:#555;margin-bottom:6px">Aucun emploi du temps généré</p>
+              <p>Choisissez un semestre puis une filière, ensuite cliquez sur Générer</p>
+            </div>
+          </div>
+          <div id="timetable-container" class="card" style="display:none;overflow-x:auto;padding:0.75rem">
+            <table class="emploi">
+              <thead>
+                <tr>
+                  <th style="width:85px"></th>
+                  <th>Lundi</th>
+                  <th>Mardi</th>
+                  <th>Mercredi</th>
+                  <th>Jeudi</th>
+                  <th>Vendredi</th>
+                  <th>Samedi</th>
+                </tr>
+              </thead>
+              <tbody id="timetable-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <div id="page-profs" class="page">
+        <div class="topbar">
+          <h2>Gestion des professeurs</h2>
+          <button class="btn btn-primary" onclick="openProfModal()"><i class="fa-solid fa-plus"></i> Ajouter</button>
+        </div>
+        <div class="content">
+          <div class="filter-bar">
+            <i class="fa-solid fa-magnifying-glass" style="color:#aaa"></i>
+            <input type="text" placeholder="Rechercher..." oninput="filterProfs(this.value)">
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Prénom</th>
+                  <th>Email</th>
+                  <th>Spécialité</th>
+                  <th style="width:110px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="profs-tbody">
+                <tr>
+                  <td colspan="5" style="text-align:center;color:#aaa;padding:2rem">Chargement...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-salles" class="page">
+        <div class="topbar">
+          <h2>Gestion des salles</h2>
+          <button class="btn btn-primary" onclick="openSalleModal()"><i class="fa-solid fa-plus"></i> Ajouter</button>
+        </div>
+        <div class="content">
+          <div class="filter-bar">
+            <i class="fa-solid fa-magnifying-glass" style="color:#aaa"></i>
+            <input type="text" placeholder="Rechercher..." oninput="filterSalles(this.value)">
+            <select onchange="salleTypeFilter=this.value;renderSalles(allSalles)">
+              <option value="">Tous les types</option>
+              <option value="amphi">Amphithéâtre</option>
+              <option value="labo">Laboratoire</option>
+              <option value="normal">Salle normale</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Capacité</th>
+                  <th>Type</th>
+                  <th style="width:120px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="salles-tbody">
+                <tr>
+                  <td colspan="4" style="text-align:center;color:#aaa;padding:2rem">Chargement...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <div id="page-filieres" class="page">
+        <div class="topbar">
+          <h2>Gestion des filières</h2>
+          <button class="btn btn-primary" onclick="openFiliereModal()"><i class="fa-solid fa-plus"></i> Ajouter</button>
+        </div>
+        <div class="content">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Étudiants</th>
+                  <th>Groupes TD</th>
+                  <th>Groupes TP</th>
+                  <th style="width:120px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="filieres-tbody">
+                <tr>
+                  <td colspan="5" style="text-align:center;color:#aaa;padding:2rem">Chargement...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modal-prof">
+    <div class="modal">
+      <div class="modal-title"><span id="prof-modal-title">Ajouter un professeur</span><button class="btn btn-sm"
+          onclick="closeModal('prof')">✕</button></div>
+      <input type="hidden" id="prof-id">
+      <div class="form-row">
+        <div class="form-group"><label>Nom</label><input type="text" id="p-nom" placeholder="Benali"></div>
+        <div class="form-group"><label>Prénom</label><input type="text" id="p-prenom" placeholder="Ahmed"></div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="text" id="p-email" placeholder="ahmed@univ.ma"></div>
+      <div class="form-group"><label>Spécialité</label><input type="text" id="p-specialite"
+          placeholder="Algorithmique, IA..."></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('prof')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveProf()"><i class="fa-solid fa-check"></i> Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modal-salle">
+    <div class="modal">
+      <div class="modal-title"><span id="salle-modal-title">Ajouter une salle</span><button class="btn btn-sm"
+          onclick="closeModal('salle')">✕</button></div>
+      <input type="hidden" id="salle-id">
+      <div class="form-row">
+        <div class="form-group"><label>Nom / Numéro</label><input type="text" id="s-nom"
+            placeholder="Amphi A / Salle 12"></div>
+        <div class="form-group"><label>Capacité</label><input type="number" id="s-capacite" placeholder="30" min="1">
+        </div>
+      </div>
+      <label style="font-size:12px;color:#666;font-weight:500;margin-bottom:10px;display:block">Type</label>
+      <div class="switch-row" onclick="toggleLabo()">
+        <div class="switch-track" id="labo-track">
+          <div class="switch-thumb"></div>
+        </div>
+        <span style="font-size:13px">Laboratoire informatique</span>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('salle')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveSalle()"><i class="fa-solid fa-check"></i> Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modal-filiere">
+    <div class="modal">
+      <div class="modal-title"><span id="filiere-modal-title">Ajouter une filière</span><button class="btn btn-sm"
+          onclick="closeModal('filiere')">✕</button></div>
+      <input type="hidden" id="filiere-id">
+      <div class="form-group"><label>Nom de la filière</label><input type="text" id="f-nom"
+          placeholder="S1 INFO, S2 SMA..."></div>
+      <div class="form-row">
+        <div class="form-group"><label>Nombre d'étudiants</label><input type="number" id="f-etudiants" placeholder="120"
+            min="1"></div>
+        <div class="form-group"><label>Groupes TD</label><input type="number" id="f-td" placeholder="2" min="1"
+            value="2"></div>
+      </div>
+      <div class="form-group"><label>Groupes TP</label><input type="number" id="f-tp" placeholder="4" min="1" value="4">
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('filiere')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveFiliere()"><i class="fa-solid fa-check"></i> Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allProfs = [], allSalles = [], salleTypeFilter = "", laboVal = 0;
+    let lastGeneratedData = [], lastFiliereName = "";
+    let touchStartY = 0, touchStartX = 0;
+
+    const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    const heures = [
+      { id: "08:30", label: "08:30 - 10:00" },
+      { id: "10:15", label: "10:15 - 11:45" },
+      { id: "12:00", label: "12:00 - 13:30" },
+      { id: "14:30", label: "14:30 - 16:00" },
+      { id: "16:15", label: "16:15 - 17:45" }
+    ];
+
+
+    function runSplash() {
+      const bar = document.getElementById("splash-bar");
+      const text = document.getElementById("splash-text");
+      const steps = [
+        { pct: 20, msg: "Connexion à la base de données..." },
+        { pct: 45, msg: "Chargement des filières..." },
+        { pct: 65, msg: "Chargement des professeurs..." },
+        { pct: 80, msg: "Chargement des salles..." },
+        { pct: 95, msg: "Préparation de l'interface..." },
+        { pct: 100, msg: "Prêt !" },
+      ];
+      let i = 0;
+      function next() {
+        if (i >= steps.length) {
+          setTimeout(() => document.getElementById("splash").classList.add("hide"), 400);
+          return;
+        }
+        const s = steps[i++];
+        bar.style.width = s.pct + "%";
+        text.textContent = s.msg;
+        setTimeout(next, i === steps.length ? 300 : 380);
+      }
+      next();
+    }
+
+    document.addEventListener("touchstart", e => {
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.addEventListener("touchend", e => {
+      const dy = touchStartY - e.changedTouches[0].clientY;
+      const dx = Math.abs(touchStartX - e.changedTouches[0].clientX);
+      if (dy > 80 && dx < 50 && !document.getElementById("fullscreen-overlay").classList.contains("open")) {
+        openFullscreen();
+      }
+    }, { passive: true });
+
+    document.getElementById("fullscreen-overlay").addEventListener("touchstart", e => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.getElementById("fullscreen-overlay").addEventListener("touchend", e => {
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (dy > 80) closeFullscreen();
+    }, { passive: true });
+
+    function openFullscreen() {
+      const overlay = document.getElementById("fullscreen-overlay");
+      const body = document.getElementById("fullscreen-body");
+      const title = document.getElementById("fullscreen-title");
+      const page = document.querySelector(".page.active")?.id?.replace("page-", "") || "planning";
+
+      if (page === "planning") {
+        title.textContent = "Emploi du Temps Complet";
+        const container = document.getElementById("timetable-container");
+        if (container && container.style.display !== "none") {
+          body.innerHTML = container.innerHTML;
+        } else {
+          body.innerHTML = `<div style="text-align:center;padding:3rem;color:#aaa">
+        <i class="fa-solid fa-calendar-xmark" style="font-size:40px;display:block;margin-bottom:1rem;opacity:0.3"></i>
+        <p>Aucun emploi du temps généré</p>
+        <p style="font-size:12px;margin-top:6px">Générez un emploi du temps d'abord</p>
+      </div>`;
+        }
+
+      } else if (page === "profs") {
+        title.textContent = "Liste des Professeurs";
+        fetch("/api/profs").then(r => r.json()).then(profs => {
+          body.innerHTML = profs.map(p => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0">
+          <div>
+            <div style="font-weight:600;font-size:14px">${p.nom} ${p.prenom}</div>
+            <div style="font-size:12px;color:#888">${p.email || ""}</div>
+          </div>
+          <span class="badge badge-cm">${p.specialite || "-"}</span>
+        </div>`).join("");
+        });
+
+      } else if (page === "salles") {
+        title.textContent = "Liste des Salles";
+        fetch("/api/salles").then(r => r.json()).then(salles => {
+          body.innerHTML = salles.map(s => {
+            const type = s.nom.toLowerCase().includes("amphi") ? "amphi" : s.labo ? "labo" : "normal";
+            const badge = type === "amphi" ? `<span class="badge badge-amphi">Amphi</span>` : type === "labo" ? `<span class="badge badge-labo">Labo</span>` : `<span class="badge badge-normal">Salle</span>`;
+            return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0">
+          <div style="font-weight:600;font-size:14px">${s.nom}</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:12px;color:#888">${s.capacite} places</span>${badge}
+          </div>
+        </div>`;
+          }).join("");
+        });
+
+      } else if (page === "filieres") {
+        title.textContent = "Liste des Filières";
+        fetch("/api/filieres/list").then(r => r.json()).then(filieres => {
+          const sems = {};
+          filieres.forEach(f => { const s = f.nom.substring(0, 2); if (!sems[s]) sems[s] = []; sems[s].push(f); });
+          body.innerHTML = Object.entries(sems).map(([sem, list]) => `
+        <div style="margin-bottom:1.25rem">
+          <div style="font-size:12px;font-weight:700;color:#534AB7;margin-bottom:8px;padding:4px 0;border-bottom:2px solid #EEEDFE">${sem}</div>
+          ${list.map(f => `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f5f5f5">
+              <span style="font-size:13px;font-weight:500">${f.nom}</span>
+              <button class="btn btn-sm btn-primary" onclick="closeFullscreen();goGenerate('${f.nom}','${sem}')">
+                <i class="fa-solid fa-rotate"></i> Générer
+              </button>
+            </div>`).join("")}
+        </div>`).join("");
+        });
+      }
+
+      overlay.classList.add("open");
+      document.getElementById("swipe-trigger").style.display = "none";
+    }
+
+    function closeFullscreen() {
+      document.getElementById("fullscreen-overlay").classList.remove("open");
+      document.getElementById("swipe-trigger").style.display = "flex";
+    }
+
+    function goGenerate(filiereName, semestre) {
+      showPage("planning");
+      document.getElementById("semestre").value = semestre;
+      loadFilieresBySemestre().then(() => {
+        const sel = document.getElementById("filiere");
+        for (let opt of sel.options) {
+          if (opt.textContent === filiereName) {
+            sel.value = opt.value;
+            onFiliereChange();
+            break;
+          }
+        }
+      });
+    }
+
+
+    function showPage(page) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+      document.getElementById("page-" + page).classList.add("active");
+      document.getElementById("nav-" + page).classList.add("active");
+      if (page === "profs") loadProfs();
+      if (page === "salles") loadSalles();
+      if (page === "filieres") loadFilieres();
+    }
+    function goDashboard() {
+      window.location.href = "dashboard";
+    }
+
+
+    async function loadFilieresBySemestre() {
+      const semestre = document.getElementById("semestre").value;
+      const selectFiliere = document.getElementById("filiere");
+      const btnGenerer = document.getElementById("btn-generer");
+
+      selectFiliere.innerHTML = `<option value="">-- Filière --</option>`;
+      selectFiliere.disabled = true;
+      btnGenerer.disabled = true;
+      document.getElementById("num2").classList.remove("done");
+      document.getElementById("num3").classList.remove("done");
+      document.getElementById("btn-download").style.display = "none";
+
+      if (!semestre) { document.getElementById("num1").classList.remove("done"); return; }
+      document.getElementById("num1").classList.add("done");
+
+      try {
+        const res = await fetch("/api/filieres/list");
+        const all = await res.json();
+        const filtered = all.filter(f => {
+          const nom = f.nom.toUpperCase().trim();
+          const sem = semestre.toUpperCase().trim();
+          return nom.startsWith(sem + " ") || nom.startsWith(sem + "_") || nom === sem;
+        });
+
+        if (!filtered.length) {
+          selectFiliere.innerHTML = `<option value="">Aucune filière pour ${semestre}</option>`;
+          return;
+        }
+        filtered.forEach(f => {
+          const opt = document.createElement("option");
+          opt.value = f.id;
+          opt.textContent = f.nom;
+          selectFiliere.appendChild(opt);
+        });
+        selectFiliere.disabled = false;
+      } catch (err) { console.error(err); }
+    }
+
+    function onFiliereChange() {
+      const val = document.getElementById("filiere").value;
+      document.getElementById("btn-generer").disabled = !val;
+      document.getElementById("num2").classList.toggle("done", !!val);
+      document.getElementById("num3").classList.remove("done");
+    }
+
+    function buildGrid() {
+      document.getElementById("timetable-body").innerHTML = heures.map(h => `
+    <tr>
+      <td class="time-col">${h.label}</td>
+      ${jours.map(j => {
+        const dis = j === "Samedi" && (h.id === "14:30" || h.id === "16:15");
+        return `<td class="${dis ? "disabled" : ""}" id="${j} ${h.id}"></td>`;
+      }).join("")}
+    </tr>
+  `).join("");
+    }
+
+    async function generate() {
+      const fid = document.getElementById("filiere").value;
+      const sel = document.getElementById("filiere");
+      lastFiliereName = sel.options[sel.selectedIndex].text;
+
+      document.getElementById("empty-state").style.display = "none";
+      document.getElementById("timetable-container").style.display = "none";
+      document.getElementById("stats-bar").style.display = "none";
+      document.getElementById("loading-state").style.display = "block";
+      document.getElementById("btn-download").style.display = "none";
+      buildGrid();
+
+      try {
+        const res = await fetch(`/generate?filiere_id=${fid}`);
+        const data = await res.json();
+        document.getElementById("loading-state").style.display = "none";
+
+        if (!data.length) { document.getElementById("empty-state").style.display = "block"; return; }
+
+        lastGeneratedData = data;
+        const profsSet = new Set(), sallesSet = new Set();
+
+        data.forEach(e => {
+          const cell = document.getElementById(e.creneau);
+          if (!cell || cell.classList.contains("disabled")) return;
+          profsSet.add(e.prof); sallesSet.add(e.salle);
+          const cls = e.type === "TD" ? "course-td" : e.type === "TP" ? "course-tp" : "course-cm";
+          const badgeCls = e.type === "CM" ? "badge-cm" : e.type === "TD" ? "badge-td" : "badge-tp";
+          const salleTxt = (e.salle.toLowerCase().includes("amphi") || e.salle.toLowerCase().includes("labo"))
+            ? e.salle : "Salle " + e.salle;
+          cell.innerHTML = `<div class="course-cell ${cls}">
+        <div class="course-name">${e.cours} <span class="badge ${badgeCls}" style="font-size:9px;padding:1px 6px">${e.type || ""}</span></div>
+        <div class="course-info"><i class="fa-solid fa-building" style="font-size:10px"></i> ${salleTxt}</div>
+        <div class="course-info"><i class="fa-solid fa-user" style="font-size:10px"></i> ${e.prof}</div>
+      </div>`;
+        });
+
+        document.getElementById("stat-total").textContent = data.length;
+        document.getElementById("stat-profs").textContent = profsSet.size;
+        document.getElementById("stat-salles").textContent = sallesSet.size;
+        document.getElementById("stats-bar").style.display = "grid";
+        document.getElementById("timetable-container").style.display = "block";
+        document.getElementById("btn-download").style.display = "inline-flex";
+        document.getElementById("num3").classList.add("done");
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById("loading-state").style.display = "none";
+        document.getElementById("empty-state").style.display = "block";
+      }
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const joursP = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+      const heuresP = ["08:30", "10:15", "12:00", "14:30", "16:15"];
+      const heuresLabels = ["08:30-10:00", "10:15-11:45", "12:00-13:30", "14:30-16:00", "16:15-17:45"];
+      const grid = {};
+      lastGeneratedData.forEach(e => { grid[e.creneau] = e; });
+      doc.setFontSize(14); doc.setTextColor(83, 74, 183);
+      doc.text(`Emploi du Temps — ${lastFiliereName}`, 14, 14);
+      doc.setFontSize(9); doc.setTextColor(150);
+      doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, 14, 20);
+      const head = [["Horaire", ...joursP]];
+      const body = heuresP.map((h, hi) => [
+        heuresLabels[hi],
+        ...joursP.map(j => {
+          if (j === "Samedi" && (h === "14:30" || h === "16:15")) return "—";
+          const e = grid[`${j} ${h}`]; if (!e) return "";
+          const salleTxt = (e.salle.toLowerCase().includes("amphi") || e.salle.toLowerCase().includes("labo")) ? e.salle : "Salle " + e.salle;
+          return `${e.cours} (${e.type || ""})\n${salleTxt}\n${e.prof}`;
+        })
+      ]);
+      doc.autoTable({
+        head, body, startY: 25,
+        styles: { fontSize: 7.5, cellPadding: 3, valign: "middle", overflow: "linebreak", lineColor: [220, 220, 230], lineWidth: 0.3, minCellHeight: 18 },
+        headStyles: { fillColor: [83, 74, 183], textColor: 255, fontStyle: "bold", halign: "center", fontSize: 8 },
+        columnStyles: { 0: { fillColor: [245, 247, 251], fontStyle: "bold", halign: "center", cellWidth: 28 } },
+        didParseCell(d) {
+          if (d.section === "body" && d.column.index > 0) {
+            const t = d.cell.raw || "";
+            if (t.includes("(CM)")) { d.cell.styles.fillColor = [238, 237, 254]; d.cell.styles.textColor = [60, 52, 137]; }
+            else if (t.includes("(TD)")) { d.cell.styles.fillColor = [255, 243, 205]; d.cell.styles.textColor = [133, 100, 4]; }
+            else if (t.includes("(TP)")) { d.cell.styles.fillColor = [234, 243, 222]; d.cell.styles.textColor = [39, 80, 10]; }
+            else if (t === "—") { d.cell.styles.fillColor = [240, 240, 240]; d.cell.styles.textColor = [180, 180, 180]; d.cell.styles.halign = "center"; }
+          }
+        },
+        margin: { left: 10, right: 10 }
+      });
+      doc.save(`emploi_du_temps_${lastFiliereName.replace(/\s+/g, "_")}.pdf`);
+    }
+
+
+    async function loadProfs() { const res = await fetch("/api/profs"); allProfs = await res.json(); renderProfs(allProfs); }
+    function renderProfs(list) {
+      const tbody = document.getElementById("profs-tbody");
+      if (!list.length) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#aaa;padding:2rem">Aucun professeur trouvé</td></tr>`; return; }
+      tbody.innerHTML = list.map(p => `<tr>
+    <td style="font-weight:500">${p.nom}</td><td>${p.prenom}</td>
+    <td style="color:#888">${p.email || "-"}</td>
+    <td><span class="badge badge-cm">${p.specialite || "-"}</span></td>
+    <td>
+      <button class="btn btn-sm" onclick='editProf(${JSON.stringify(p)})' style="margin-right:4px" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="deleteProf(${p.id})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+    </td></tr>`).join("");
+    }
+    function filterProfs(v) { const q = v.toLowerCase(); renderProfs(allProfs.filter(p => (p.nom + p.prenom + (p.email || "") + (p.specialite || "")).toLowerCase().includes(q))); }
+    function openProfModal() { document.getElementById("prof-modal-title").textContent = "Ajouter un professeur"; document.getElementById("prof-id").value = "";["p-nom", "p-prenom", "p-email", "p-specialite"].forEach(id => document.getElementById(id).value = ""); document.getElementById("modal-prof").classList.add("open"); }
+    function editProf(p) { document.getElementById("prof-modal-title").textContent = "Modifier le professeur"; document.getElementById("prof-id").value = p.id; document.getElementById("p-nom").value = p.nom; document.getElementById("p-prenom").value = p.prenom; document.getElementById("p-email").value = p.email || ""; document.getElementById("p-specialite").value = p.specialite || ""; document.getElementById("modal-prof").classList.add("open"); }
+    async function saveProf() {
+      const id = document.getElementById("prof-id").value;
+      const data = { nom: document.getElementById("p-nom").value.trim(), prenom: document.getElementById("p-prenom").value.trim(), email: document.getElementById("p-email").value.trim(), specialite: document.getElementById("p-specialite").value.trim() };
+      if (!data.nom || !data.prenom) return alert("Nom et prénom obligatoires");
+      await fetch(id ? `/api/profs/${id}` : "/api/profs", { method: id ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+      closeModal("prof"); loadProfs();
+    }
+    async function deleteProf(id) { if (!confirm("Supprimer ce professeur ?")) return; await fetch(`/api/profs/${id}`, { method: "DELETE" }); loadProfs(); }
+
+
+    async function loadSalles() { const res = await fetch("/api/salles"); allSalles = await res.json(); renderSalles(allSalles); }
+    function getSalleType(s) { if (s.nom.toLowerCase().includes("amphi")) return "amphi"; if (s.labo) return "labo"; return "normal"; }
+    function renderSalles(list) {
+      const filtered = salleTypeFilter ? list.filter(s => getSalleType(s) === salleTypeFilter) : list;
+      const tbody = document.getElementById("salles-tbody");
+      if (!filtered.length) { tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#aaa;padding:2rem">Aucune salle trouvée</td></tr>`; return; }
+      tbody.innerHTML = filtered.map(s => {
+        const type = getSalleType(s);
+        const badge = type === "amphi" ? `<span class="badge badge-amphi"><i class="fa-solid fa-building" style="font-size:10px"></i> Amphithéâtre</span>` : type === "labo" ? `<span class="badge badge-labo"><i class="fa-solid fa-computer" style="font-size:10px"></i> Laboratoire</span>` : `<span class="badge badge-normal">Salle normale</span>`;
+        return `<tr><td style="font-weight:500">${s.nom}</td><td>${s.capacite} places</td><td>${badge}</td><td>
+      <button class="btn btn-sm" onclick='editSalle(${JSON.stringify(s)})' style="margin-right:4px" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="deleteSalle(${s.id})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+    </td></tr>`;
+      }).join("");
+    }
+    function filterSalles(v) { const q = v.toLowerCase(); renderSalles(allSalles.filter(s => s.nom.toLowerCase().includes(q))); }
+    function openSalleModal() { document.getElementById("salle-modal-title").textContent = "Ajouter une salle"; document.getElementById("salle-id").value = ""; document.getElementById("s-nom").value = ""; document.getElementById("s-capacite").value = ""; laboVal = 0; document.getElementById("labo-track").classList.remove("on"); document.getElementById("modal-salle").classList.add("open"); }
+    function editSalle(s) { document.getElementById("salle-modal-title").textContent = "Modifier la salle"; document.getElementById("salle-id").value = s.id; document.getElementById("s-nom").value = s.nom; document.getElementById("s-capacite").value = s.capacite; laboVal = s.labo || 0; laboVal ? document.getElementById("labo-track").classList.add("on") : document.getElementById("labo-track").classList.remove("on"); document.getElementById("modal-salle").classList.add("open"); }
+    function toggleLabo() { laboVal = laboVal ? 0 : 1; laboVal ? document.getElementById("labo-track").classList.add("on") : document.getElementById("labo-track").classList.remove("on"); }
+    async function saveSalle() {
+      const id = document.getElementById("salle-id").value;
+      const data = { nom: document.getElementById("s-nom").value.trim(), capacite: parseInt(document.getElementById("s-capacite").value) || 0, labo: laboVal };
+      if (!data.nom || !data.capacite) return alert("Nom et capacité obligatoires");
+      await fetch(id ? `/api/salles/${id}` : "/api/salles", { method: id ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+      closeModal("salle"); loadSalles();
+    }
+    async function deleteSalle(id) { if (!confirm("Supprimer cette salle ?")) return; await fetch(`/api/salles/${id}`, { method: "DELETE" }); loadSalles(); }
+
+
+    async function loadFilieres() { const res = await fetch("/api/filieres"); const list = await res.json(); renderFilieres(list); }
+    function renderFilieres(list) {
+      const tbody = document.getElementById("filieres-tbody");
+      if (!list.length) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#aaa;padding:2rem">Aucune filière trouvée</td></tr>`; return; }
+      tbody.innerHTML = list.map(f => `<tr>
+    <td style="font-weight:500">${f.nom}</td>
+    <td>${f.nb_etudiants || "-"}</td>
+    <td><span class="badge badge-td">${f.nb_td} groupe(s)</span></td>
+    <td><span class="badge badge-tp">${f.nb_tp} groupe(s)</span></td>
+    <td>
+      <button class="btn btn-sm" onclick='editFiliere(${JSON.stringify(f)})' style="margin-right:4px" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="deleteFiliere(${f.id})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+    </td></tr>`).join("");
+    }
+    function openFiliereModal() { document.getElementById("filiere-modal-title").textContent = "Ajouter une filière"; document.getElementById("filiere-id").value = ""; document.getElementById("f-nom").value = ""; document.getElementById("f-etudiants").value = ""; document.getElementById("f-td").value = "2"; document.getElementById("f-tp").value = "4"; document.getElementById("modal-filiere").classList.add("open"); }
+    function editFiliere(f) { document.getElementById("filiere-modal-title").textContent = "Modifier la filière"; document.getElementById("filiere-id").value = f.id; document.getElementById("f-nom").value = f.nom; document.getElementById("f-etudiants").value = f.nb_etudiants || ""; document.getElementById("f-td").value = f.nb_td || 2; document.getElementById("f-tp").value = f.nb_tp || 4; document.getElementById("modal-filiere").classList.add("open"); }
+    async function saveFiliere() {
+      const id = document.getElementById("filiere-id").value;
+      const data = { nom: document.getElementById("f-nom").value.trim(), nb_etudiants: parseInt(document.getElementById("f-etudiants").value) || 0, nb_td: parseInt(document.getElementById("f-td").value) || 1, nb_tp: parseInt(document.getElementById("f-tp").value) || 1 };
+      if (!data.nom) return alert("Nom de la filière obligatoire");
+      await fetch(id ? `/api/filieres/${id}` : "/api/filieres", { method: id ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+      closeModal("filiere"); loadFilieres();
+    }
+    async function deleteFiliere(id) { if (!confirm("Supprimer cette filière ?")) return; await fetch(`/api/filieres/${id}`, { method: "DELETE" }); loadFilieres(); }
+
+
+    function closeModal(type) { document.getElementById("modal-" + type).classList.remove("open"); }
+
+
+    buildGrid();
+    runSplash();
+  </script>
+</body>
+
+</html>
